@@ -51,10 +51,11 @@ deployer {
         developer("Havish Sripada", "havish@pedropathing.com")
     }
 
-    signing {
-        key = secret("MVN_GPG_KEY")
-        password = secret("MVN_GPG_PASSWORD")
-    }
+    // Disable signing
+    // signing {
+    //     key = secret("MVN_GPG_KEY")
+    //     password = secret("MVN_GPG_PASSWORD")
+    // }
 
     content {
         androidComponents("release") {
@@ -62,21 +63,21 @@ deployer {
         }
     }
 
-    centralPortalSpec {
-        auth {
-            user = secret("SONATYPE_USERNAME")
-            password = secret("SONATYPE_PASSWORD")
-        }
-        allowMavenCentralSync = false
-    }
-
-    nexusSpec("snapshot") {
-        repositoryUrl = "https://central.sonatype.com/repository/maven-snapshots/"
-        auth {
-            user = secret("SONATYPE_USERNAME")
-            password = secret("SONATYPE_PASSWORD")
-        }
-    }
+//    centralPortalSpec {
+//        auth {
+//            user = secret("SONATYPE_USERNAME")
+//            password = secret("SONATYPE_PASSWORD")
+//        }
+//        allowMavenCentralSync = false
+//    }
+//
+//    nexusSpec("snapshot") {
+//        repositoryUrl = "https://central.sonatype.com/repository/maven-snapshots/"
+//        auth {
+//            user = secret("SONATYPE_USERNAME")
+//            password = secret("SONATYPE_PASSWORD")
+//        }
+//    }
 
     localSpec()
 }
