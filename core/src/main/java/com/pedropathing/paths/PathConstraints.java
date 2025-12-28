@@ -63,12 +63,6 @@ public final class PathConstraints {
      */
     private int BEZIER_CURVE_SEARCH_LIMIT;
 
-    /**
-     * Tells the Follower whether to pursue the gradient when doing translational correction;
-     * default value: false, but recommended true for nonholonomic drivetrains
-     */
-    private boolean gradientCorrection;
-
     public PathConstraints(double tValueConstraint, double velocityConstraint, double translationalConstraint, double headingConstraint, double timeoutConstraint, double brakingStrength, int BEZIER_CURVE_SEARCH_LIMIT, double brakingStart) {
         this.tValueConstraint = tValueConstraint;
         this.velocityConstraint = velocityConstraint;
@@ -92,10 +86,6 @@ public final class PathConstraints {
 
     public double getVelocityConstraint() {
         return velocityConstraint;
-    }
-
-    public boolean isGradientCorrection() {
-        return gradientCorrection;
     }
 
     public double getTranslationalConstraint() {
@@ -162,7 +152,7 @@ public final class PathConstraints {
         this.velocityConstraint = velocityConstraint;
     }
 
-    public void setGradientCorrection(boolean gradientCorrection) {
-        this.gradientCorrection = gradientCorrection;
+    public PathConstraints copy() {
+        return new PathConstraints(tValueConstraint, velocityConstraint, translationalConstraint, headingConstraint, timeoutConstraint, brakingStrength, BEZIER_CURVE_SEARCH_LIMIT, brakingStart);
     }
 }

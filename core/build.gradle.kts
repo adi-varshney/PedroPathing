@@ -21,7 +21,6 @@ val dokkaJar = tasks.register<Jar>("dokkaJar") {
 }
 
 deployer {
-
     projectInfo {
         name = "Pedro Pathing Core"
         description = "A path follower designed to revolutionize autonomous pathing in robotics"
@@ -35,12 +34,6 @@ deployer {
         developer("Havish Sripada", "havish@pedropathing.com")
     }
 
-    // Disable signing
-    // signing {
-    //     key = secret("MVN_GPG_KEY")
-    //     password = secret("MVN_GPG_PASSWORD")
-    // }
-
     content {
         component {
             fromJava()
@@ -49,21 +42,28 @@ deployer {
         }
     }
 
-//    centralPortalSpec {
-//        auth {
-//            user = secret("SONATYPE_USERNAME")
-//            password = secret("SONATYPE_PASSWORD")
-//        }
-//        allowMavenCentralSync = false
-//    }
-//
-//    nexusSpec("snapshot") {
-//        repositoryUrl = "https://central.sonatype.com/repository/maven-snapshots/"
-//        auth {
-//            user = secret("SONATYPE_USERNAME")
-//            password = secret("SONATYPE_PASSWORD")
-//        }
-//    }
+    if (System.getenv("PUBLISH_PEDRO") == "yes please") {
+        signing {
+            key = secret("MVN_GPG_KEY")
+            password = secret("MVN_GPG_PASSWORD")
+        }
+
+        centralPortalSpec {
+            auth {
+                user = secret("SONATYPE_USERNAME")
+                password = secret("SONATYPE_PASSWORD")
+            }
+            allowMavenCentralSync = false
+        }
+
+        nexusSpec("snapshot") {
+            repositoryUrl = "https://central.sonatype.com/repository/maven-snapshots/"
+            auth {
+                user = secret("SONATYPE_USERNAME")
+                password = secret("SONATYPE_PASSWORD")
+            }
+        }
+    }
 
     localSpec()
 }

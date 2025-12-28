@@ -66,17 +66,6 @@ public class ErrorCalculator {
         double x = closestPose.getX() - currentPose.getX();
         double y = closestPose.getY() - currentPose.getY();
         error.setOrthogonalComponents(x, y);
-
-        if (currentPath.getConstraints().isGradientCorrection()) {
-            Vector derivative = currentPath.getClosestPointTangentVector();
-            Vector normalVector = new Vector(1.0, derivative.getTheta() + Math.PI / 2);
-
-            if (error.dot(normalVector) < 0)
-                normalVector = normalVector.flip();
-
-            error = error.projectOnto(normalVector);
-        }
-
         return error;
     }
 
@@ -95,23 +84,8 @@ public class ErrorCalculator {
     }
 
     /**
-     * This returns the raw heading error, or how far off the closest point the robot is.
-     *
-     * @return This returns the raw heading error as a double.
-     */
-    public double getHeadingError(double headingGoal) {
-        if (currentPath == null) {
-            return 0;
-        }
-
-        this.headingGoal = headingGoal;
-        headingError = MathFunctions.getTurnDirection(currentPose.getHeading(), headingGoal) * MathFunctions.getSmallestAngleDifference(currentPose.getHeading(), headingGoal);
-        return headingError;
-    }
-
-    /**
-     * This returns the velocity the robot needs to be at to make it to the end of the Path
-     * at some specified deceleration (well technically just some negative acceleration).
+     * This returns the error in the velocity the robot needs to be at to make it to the end of the Path
+     * at some specified deceleration (well technically just some negative acceleration) relative to the robot's current velocity.
      *
      * @return returns the projected velocity.
      */
@@ -175,6 +149,12 @@ public class ErrorCalculator {
         return driveKalmanFilter.getState();
     }
 
+    /**
+     * This returns the drive error, which is computed by taking the distance to the goal. Using this distance,
+     * Pedro uses a predictive model to determine what the target velocity should be in order to reach the goal without overshooting.
+     * The drive error is taken to be a modified form of the difference between the target velocity and the current velocity, which is then infused with a Kalman Filter
+     * @return The drive error as a double.
+     */
     public double getDriveError() {
         if (driveError != null) return driveError;
 
@@ -202,7 +182,7 @@ public class ErrorCalculator {
                     Vector forwardTheoreticalHeadingVector = new Vector(1.0, headingGoal);
 
                     double stoppingDistance = Kinematics.getStoppingDistance(
-                            yVelocity + (xVelocity - yVelocity) * forwardTheoreticalHeadingVector.dot(tangent), constants.forwardZeroPowerAcceleration
+                            yVelocity + (xVelocity - yVelocity) * Math.abs(forwardTheoreticalHeadingVector.dot(tangent)), constants.forwardZeroPowerAcceleration
                     );
                     if (distanceToGoal >= stoppingDistance * currentPath.getBrakingStartMultiplier()) {
                         return -1;
@@ -252,8 +232,8 @@ public class ErrorCalculator {
                "Closest Pose: " + closestPose.toString() + "\n" +
                "Current Path: " + (currentPath != null ? currentPath.toString() : "null") + "\n" + "Following Path Chain: " + followingPathChain + "\n" +
                "Chain Index: " + chainIndex + "\n" +
-               "Drive Error: " + getDriveError() + "\n" +
-               "Heading Error: " + getHeadingError() + "\n" +
-               "Raw Drive Error: " + getRawDriveError();
+               "Drive Error: " + driveError + "\n" +
+               "Heading Error: " + headingError + "\n" +
+               "Raw Drive Error: " + rawDriveError;
     }
 }
